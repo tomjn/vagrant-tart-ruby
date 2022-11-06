@@ -9,6 +9,7 @@ module Vagrant
     # of a Vagrant-configured system.
     class Provider < Vagrant.plugin(2, :provider)
       def initialize(machine)
+        @logger = Log4r::Logger.new("vagrant::provider::tart")
         @machine = machine
       end
 
