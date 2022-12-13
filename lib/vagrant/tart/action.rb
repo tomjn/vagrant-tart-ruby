@@ -3,7 +3,16 @@
 module Vagrant
   module Tart
     module Action
+      autoload :Boot, File.expand_path("../action/boot", __FILE__)
+      autoload :CheckAccessible, File.expand_path("../action/check_accessible", __FILE__)
+      autoload :CheckCreated, File.expand_path("../action/check_created", __FILE__)
+      autoload :CheckRunning, File.expand_path("../action/check_running", __FILE__)
       autoload :CheckTart, File.expand_path("../action/check_tart", __FILE__)
+      autoload :Created, File.expand_path("../action/created", __FILE__)
+      autoload :Customize, File.expand_path("../action/customize", __FILE__)
+      autoload :Destroy, File.expand_path("../action/destroy", __FILE__)
+
+      # TODO: Add more actions from the official virtualbox provider where relevant
 
       # Include the built-in modules so that we can use them as top-level
       # things.
@@ -13,6 +22,7 @@ module Vagrant
       # a bootup (i.e. not saved).
       def self.action_boot
         Vagrant::Action::Builder.new.tap do |b|
+          b.use CheckAccessible
           b.use CheckTart
         end
       end
@@ -37,6 +47,17 @@ module Vagrant
       def self.action_package
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use Call, Created do |env1, b2|
+            if !env1[:result]
+              b2.use MessageNotCreated
+              next
+            end
+
+            #b2.use PackageSetupFolders
+            #b2.use PackageSetupFiles
+            b2.use CheckAccessible
+            b2.use action_halt
+          end
         end
       end
 
@@ -53,6 +74,16 @@ module Vagrant
       def self.action_reload
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use Call, Created do |env1, b2|
+            if !env1[:result]
+              b2.use MessageNotCreated
+              next
+            end
+
+            #b2.use ConfigValidate
+            b2.use action_halt
+            b2.use action_start
+          end
         end
       end
 
@@ -88,6 +119,10 @@ module Vagrant
       def self.action_ssh
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use CheckCreated
+          b.use CheckAccessible
+          b.use CheckRunning
+          #b.use SSHExec
         end
       end
 
@@ -95,6 +130,10 @@ module Vagrant
       def self.action_ssh_run
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use CheckCreated
+          b.use CheckAccessible
+          b.use CheckRunning
+          #b.use SSHRun
         end
       end
 
