@@ -3,14 +3,20 @@
 module Vagrant
   module Tart
     module Action
+      action_root = Pathname.new(File.expand_path("../action", __FILE__))
       autoload :Boot, File.expand_path("../action/boot", __FILE__)
       autoload :CheckAccessible, File.expand_path("../action/check_accessible", __FILE__)
       autoload :CheckCreated, File.expand_path("../action/check_created", __FILE__)
       autoload :CheckRunning, File.expand_path("../action/check_running", __FILE__)
-      autoload :CheckTart, File.expand_path("../action/check_tart", __FILE__)
+      autoload :CheckTart, action_root.join('check_tart')
       autoload :Created, File.expand_path("../action/created", __FILE__)
       autoload :Customize, File.expand_path("../action/customize", __FILE__)
-      autoload :Destroy, File.expand_path("../action/destroy", __FILE__)
+
+      autoload :Destroy, action_root.join('action/destroy')
+
+      autoload :CreateInstance, action_root.join('create_instance')
+      autoload :StartInstance, action_root.join('start_instance')
+      autoload :StopInstance, action_root.join('stop_instance')
 
       # TODO: Add more actions from the official virtualbox provider where relevant
 
@@ -32,6 +38,25 @@ module Vagrant
       def self.action_destroy
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use Call, IsState, :not_created do |env1, b1|
+            if env1[:result]
+              b1.use Message, I18n.t("vagrant_tart.message_not_created")
+              next
+            end
+
+            b1.use Call, DestroyConfirm do |env2, b2|
+              #if !env2[:result]
+              #  b2.use MessageWillNotDestroy
+              #  next
+              #end
+
+              #b2.use ConfigValidate
+              #b2.use ProvisionerCleanup, :before
+              b2.use StopInstance
+              b2.use Destroy
+              #b2.use SyncedFolderCleanup
+            end
+          end
         end
       end
 
@@ -40,6 +65,7 @@ module Vagrant
       def self.action_halt
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          b.use StopInstance
         end
       end
 
@@ -141,7 +167,21 @@ module Vagrant
       # A precondition of this action is that the VM exists.
       def self.action_start
         Vagrant::Action::Builder.new.tap do |b|
-          b.use CheckTart
+          b.use Call, IsState, :running do |env1, b1|
+            if env1[:result]
+              b1.use action_provision
+              next
+            end
+
+            #b3.use CleanupDisks
+            #b3.use Disk
+            #b3.use SyncedFolderCleanup
+            b3.use StartInstance
+            #b3.use WaitForIPAddress
+            #b3.use WaitForCommunicator, [:running]
+            #b3.use SyncedFolders
+            #b3.use SetHostname
+          end
         end
       end
 
@@ -166,6 +206,15 @@ module Vagrant
       def self.action_up
         Vagrant::Action::Builder.new.tap do |b|
           b.use CheckTart
+          #b.use HandleBox
+          #b.use ConfigValidate
+          b.use Call, IsState, :not_created do |env1, b1|
+            if env1[:result]
+              b1.use CreateInstance
+            end
+
+            b1.use action_start
+          end
         end
       end
     end
