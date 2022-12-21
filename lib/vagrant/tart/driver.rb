@@ -54,6 +54,10 @@ module Vagrant
         return nil
       end
 
+      def has_tart?
+        execute(:check_tart)
+      end
+
       def start
         execute(:start_vm, VmId: vm_id )
       end

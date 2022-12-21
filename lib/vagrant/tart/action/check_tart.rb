@@ -13,6 +13,14 @@ module Vagrant
         end
 
         def call(env)
+          env[:ui].output('Checking Tart...')
+          unless env[:machine].provider.driver.has_tart
+            raise TartRequired
+          end
+          @app.call(env)
+        end
+
+        def call(env)
           if Vagrant::Util::Platform.windows?
             @logger.error("Tart is a MacOS only provider, it cannot be used on windows.")
 
