@@ -8,6 +8,10 @@ module Vagrant
       class MacRequired < TartError
         error_key(:mac_required)
       end
+
+      class ShellScriptError < TartError
+        error_key(:shellscript_error)
+      end
     end
   end
 end
