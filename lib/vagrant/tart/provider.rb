@@ -11,7 +11,7 @@ module Vagrant
 
       # This provider only supports MacOS so raise an error on other platforms
       def self.usable?(raise_error=false)
-        unless Vagrant::Util::Platform.platform == 'darwin19'
+        unless Vagrant::Util::Platform.darwin?
           raise Errors::MacRequired
         end
 
