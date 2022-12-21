@@ -8,6 +8,19 @@ module Vagrant
 
       # @return [Integer] Disk storage size in GB
       attr_accessor :disksize
+
+      # @return [Boolean] Show a GUI window on boot, or run headless
+      attr_accessor :gui
+
+      def initialize
+        @memory = 2048
+        @disksize = 20
+        @gui = false
+      end
+
+      def to_s
+        "Tart"
+      end
     end
   end
 end
