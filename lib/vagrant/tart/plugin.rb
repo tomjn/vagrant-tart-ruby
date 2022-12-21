@@ -12,6 +12,9 @@ raise "The Vagrant Tart plugin is only compatible with Vagrant 2.3+" if Vagrant:
 
 module Vagrant
   module Tart
+    autoload :Action, File.expand_path("../action", __FILE__)
+    autoload :Errors, File.expand_path("../errors", __FILE__)
+
     # Main vagrant plugin class
     class Plugin < Vagrant.plugin("2")
       name "Tart"
