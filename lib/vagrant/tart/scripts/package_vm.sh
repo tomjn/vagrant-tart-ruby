@@ -2,4 +2,5 @@
 
 set -eo pipefail
 
-return 0
+VM_NAME=$1
+
