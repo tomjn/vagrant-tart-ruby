@@ -2,4 +2,8 @@
 
 set -eo pipefail
 
-return 0
+if command -v tart &> /dev/null; then
+    return 0
+fi
+
+return 1
