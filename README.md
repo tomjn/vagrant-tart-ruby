@@ -18,7 +18,28 @@ This is a primer on how a vagrant provider works. These are the main parts and w
  - `driver.rb` this is a class that the actions use to interact directly with Tart
    - `scripts/` To make things easier, the driver will call a shellscript in this folder so that Tart can be called in a way that doesn't require Ruby and the Ruby side doesn't need changing much. E.g. `stop_vm.sh` should stop a VM ( with the VM ID passed as a parameter ). `driver.rb` will then inspect the output of the script to determine success of failure
 
+## Box Format
 
+A Tart Vagrant box is a zip/box file containing a vagrantfile and the contents of a tart VM.
+
+### Tart VMs
+
+Tart VMs are folders in `~/.tart/vms` that take this format where `vmname` is the name of the VM in Tart:
+
+ - vmname/
+ - vmname/disk.img
+ - vmname/nvmram.bin
+ - vmname/config.json
+
+This is also the format of Tart VMs sent to and pulled from OCI registries.
+
+### Vagrant Box Packages
+
+The box is the contents of the VM folder, with a vagrantfile alongside. It's expected that when imported the contents of the box will be extracted into a folder with that name inside `~/.tart/vms`.
+
+###  Identifying Vagrant VMs in Tart
+
+Because it's expected the box contents will become the VM, Vagrant VMs in Tart will have a vagrantfile in their folder. It's also expected their name will have a prefix e.g. `vagrant_vm_`. This is to aid in identification and to avoid clashes and name collisions with non-vagrant Tart usage.
 
 ## Installation
 
