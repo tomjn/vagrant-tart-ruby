@@ -17,7 +17,7 @@ module Vagrant
           raise Errors::MacRequired
         end
 
-        true
+        return true
       rescue Errors::TartError
         raise if raise_error
         return false
