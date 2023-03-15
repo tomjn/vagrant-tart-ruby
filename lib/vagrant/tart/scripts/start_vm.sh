@@ -5,7 +5,8 @@ set -eo pipefail
 VM_NAME=$1
 
 # start Tart VM async
-tart run "${VM_NAME}" --no-graphics &
+
+nohup tart run "${VM_NAME}" --no-graphics >/dev/null 2>&1 &
 
 # wait a short period
 
