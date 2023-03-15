@@ -2,6 +2,8 @@
 
 require "log4r"
 
+require_relative "driver"
+
 module Vagrant
   module Tart
     # This is the base class for a provider for the V2 API. A provider
