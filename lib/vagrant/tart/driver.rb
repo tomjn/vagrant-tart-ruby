@@ -58,7 +58,7 @@ module Vagrant
         execute(:check_tart)
       end
 
-      def start
+      def start(boot_mode)
         execute(:start_vm, VmId: vm_id )
       end
 
